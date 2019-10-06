@@ -1,0 +1,25 @@
+body {
+	font-family: 'Roboto', sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+.x {
+	background-color: rgba(0, 0, 0, .05);
+}
+
+h1 {
+	font-weight: 100;
+}
+
+.menu-icon {
+	font-size: 36px
+}
+
+.nav-item {
+	font-size: 24px;
+	font-weight: 400;
+}
+
+a {
+	color: inherit;
+}
