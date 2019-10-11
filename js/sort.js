@@ -1,26 +1,30 @@
 var array = [];
-var frame = 0;
 let fr = 60;
 var sorter;
-var canvas;
-var curr, comp;
+var dimension, canvas, curr, comp, parent;
 
 function setup() {
-    var parent = document.getElementById('main');
-    canvas = createCanvas(parent.offsetWidth, parent.offsetHeight);
-    canvas.parent('canvas');
-    fill(255);
-    frameRate(fr);
+    parent = document.getElementById('main');
+    canvas = createCanvas(dimension, dimension);
+    resize();
     init();
 }
 
+function resize() {
+    dimension = min(parent.offsetWidth, parent.offsetHeight);
+    resizeCanvas(dimension, dimension);
+}
+
 function init() {
+    canvas.parent('canvas');
+    fill(255);
+    frameRate(fr);
     background(255);
 
     //init array values based on height of screen
-    array.length = (int)(height / 10);
+    array.length = (int)(dimension / 10);
     for (i = 0; i < array.length; i++) {
-        array[i] = ((i + 1) / array.length) * height;
+        array[i] = ((i + 1) / array.length) * dimension;
     }
 
     //shuffle values
@@ -35,6 +39,7 @@ function init() {
 
 
 function draw() {
+    dimension = min(parent.offsetWidth, parent.offsetHeight);
     background(255);
     strokeWeight(4);
     stroke(255);
@@ -77,5 +82,13 @@ function* bubblesort() {
 }
 
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
+    resize();
+}
+
+function pause() {
+    noLoop();
+}
+
+function play() {
+    loop();
 }

@@ -52,3 +52,8 @@ a:hover {
     height: 200px;
     border-radius: 50% 50%;
 }
+
+.btn-light{
+    color: #130b15;
+    background-color: white;;
+}
