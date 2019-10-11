@@ -45,12 +45,10 @@
                     <input type="range" class="custom-range" min="5" max="60" step="2" id="frameRate"></div>
             </div>
             <div class="row justify-content-center">
-                <button class="btn btn-outline-light m-2" ><i class="fa fa-repeat"></i></button>
-                <button class="btn btn-outline-light m-2" ><i class="fa fa-pause"
-                        onclick="pause()"></i></button>
-                <button class="btn btn-outline-light m-2" ><i class="fa fa-play"
-                        onclick="play()"></i></button>
-                <button class="btn btn-outline-light m-2" type="button"><i class="fa fa-step-forward"></i></button>
+                <div class="btn btn-outline-light m-2" onclick="restart()"><i class="fa fa-repeat"></i></div>
+                <div class="btn btn-outline-light m-2" onclick="pause()"><i class="fa fa-pause"></i></div>
+                <div class="btn btn-outline-light m-2" onclick="play()"><i class="fa fa-play"></i></div>
+                <div class="btn btn-outline-light m-2" onclick="step()"><i class="fa fa-step-forward"></i></div>
             </div>
         </div>
     </div>

@@ -7,12 +7,13 @@ function setup() {
     parent = document.getElementById('main');
     canvas = createCanvas(dimension, dimension);
     resize();
-    init();
 }
 
+//resizes the canvas to be the biggest square it can be
 function resize() {
     dimension = min(parent.offsetWidth, parent.offsetHeight);
     resizeCanvas(dimension, dimension);
+    init();
 }
 
 function init() {
@@ -20,6 +21,8 @@ function init() {
     fill(255);
     frameRate(fr);
     background(255);
+    curr = 0;
+    comp = 1;
 
     //init array values based on height of screen
     array.length = (int)(dimension / 10);
@@ -35,6 +38,7 @@ function init() {
         array[a] = b;
     }
     sorter = bubblesort();
+    redraw();
 }
 
 
@@ -58,7 +62,6 @@ function draw() {
         //draw rectangle (xpos, ypos, width, height);
         //canvas 0,0 = top left
         rect(l * (width / array.length), height + 4, (width / array.length), -array[l]);
-
     }
     if (sorter.next().done) {
         noLoop();
@@ -77,6 +80,9 @@ function* bubblesort() {
                 array[z] = array[z + 1]; //Replace current number with adjacent number
                 array[z + 1] = tmp;
             }
+            curr = z + 1;
+            comp = z;
+            yield;
         }
     }
 }
@@ -91,4 +97,12 @@ function pause() {
 
 function play() {
     loop();
+}
+
+function step() {
+    redraw();
+}
+
+function restart(){
+    resize();
 }
