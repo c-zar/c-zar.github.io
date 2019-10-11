@@ -93,16 +93,20 @@ function* bubblesort() {
 
 function* partition(low, high) {
     let pivot = array[high];
-    let j = low - 1;
+    curr = high;
+    let j = low;
     for (let i = low; i < high; i++) {
-        if (array[i] < pivot) {
+        if (array[i] > pivot) {
+            swap(i, i + 1);
+        } else {
             j++;
-            swap(i, j);
         }
+        comp = i; 
+
         yield;                              //yield to so we can redraw array
     }
-    swap(i + 1, high);
-    return (i + 1);
+    swap(j + 1, high);
+    return (j + 1);
 }
 
 function* quicksort(low, high) {
