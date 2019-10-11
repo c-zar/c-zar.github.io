@@ -1,25 +1,54 @@
+/* 
+#130b15;
+*/
+
+
 body {
-	font-family: 'Roboto', sans-serif;
-	-webkit-font-smoothing: antialiased;
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-.x {
-	background-color: rgba(0, 0, 0, .05);
+.dark {
+    background-color: #130b15;
+    color: white;
 }
 
-h1 {
-	font-weight: 100;
+.light {
+    color: #130b15;
+    background-color: white;
 }
 
-.menu-icon {
-	font-size: 36px
+#background {
+    width: 100%;
+    height: 100%;
 }
 
-.nav-item {
-	font-size: 24px;
-	font-weight: 400;
+#name {
+    font-size: 50px;
+    font-weight: 100;
+}
+
+.checked {
+    color: orange;
 }
 
 a {
-	color: inherit;
+    color: inherit;
+}
+
+a:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.linked-in{
+    font-size: 2em;
+}
+
+.pic {
+    background-image: url(/css/test2.JPG);
+    background-size: 100% auto;
+    width: 200px;
+    height: 200px;
+    border-radius: 50% 50%;
 }
