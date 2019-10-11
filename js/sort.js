@@ -37,7 +37,7 @@ function init() {
         array[j] = array[a];
         array[a] = b;
     }
-    sorter = bubblesort();
+    sorter = partition(0, array.length - 1);
     redraw();
 }
 
@@ -68,6 +68,12 @@ function draw() {
     }
 }
 
+function swap(i, j) {
+    let tmp = array[i]; //Temporary variable to hold the current number
+    array[i] = array[j];
+    array[j] = tmp;
+}
+
 function* bubblesort() {
     for (let x = 0; x < array.length - 1; x++) {
         for (let z = 0; z < array.length - x - 1; z++) {
@@ -76,14 +82,34 @@ function* bubblesort() {
             yield;                              //yield to so we can redraw array
             if (array[z] > array[z + 1]) {
                 //Swap the numbers
-                let tmp = array[z]; //Temporary variable to hold the current number
-                array[z] = array[z + 1]; //Replace current number with adjacent number
-                array[z + 1] = tmp;
+                swap(z, z + 1)
             }
             curr = z + 1;
             comp = z;
             yield;
         }
+    }
+}
+
+function* partition(low, high) {
+    let pivot = array[high];
+    let j = low - 1;
+    for (let i = low; i < high; i++) {
+        if (array[i] < pivot) {
+            j++;
+            swap(i, j);
+        }
+        yield;                              //yield to so we can redraw array
+    }
+    swap(i + 1, high);
+    return (i + 1);
+}
+
+function* quicksort(low, high) {
+    if (low < high) {
+        mid = partition(low,high);
+        quicksort(low, mid - 1);
+        quicksort(mid + 1, high);
     }
 }
 
@@ -103,6 +129,6 @@ function step() {
     redraw();
 }
 
-function restart(){
+function restart() {
     resize();
 }
