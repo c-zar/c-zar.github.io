@@ -1,11 +1,18 @@
-var array = [];
-let fr = 60;
-var sorter;
-var dimension, canvas, curr, comp, parent;
+var mainArray = [];
+var arrayState = [];
+var delay = 50;
+var cancel = false;
+
+var dimension, canvas, parent;
+
+/*
+    P5 js specific code
+*/
 
 function setup() {
     parent = document.getElementById('main');
     canvas = createCanvas(dimension, dimension);
+    canvas.parent('canvas');
     resize();
 }
 
@@ -13,126 +20,134 @@ function setup() {
 function resize() {
     dimension = min(parent.offsetWidth, parent.offsetHeight);
     resizeCanvas(dimension, dimension);
-    init();
+    initArray();
 }
 
-function init() {
-    canvas.parent('canvas');
-    fill(255);
-    frameRate(fr);
-    background(255);
-    curr = 0;
-    comp = 1;
-
+function initArray() {
     //init array values based on height of screen
-    array.length = (int)(dimension / 10);
-    for (i = 0; i < array.length; i++) {
-        array[i] = ((i + 1) / array.length) * dimension;
+    mainArray = new Array(floor(dimension / 20));
+    arrayState = Array(mainArray.length).fill(0);
+    for (i = 0; i < mainArray.length; i++) {
+        mainArray[i] = ((i + 1) / mainArray.length) * dimension;
     }
 
     //shuffle values
-    for (j = 0; j < array.length; j++) {
-        a = floor(random(array.length));
-        b = array[j];
-        array[j] = array[a];
-        array[a] = b;
+    for (j = 0; j < mainArray.length; j++) {
+        a = floor(random(mainArray.length));
+        b = mainArray[j];
+        mainArray[j] = mainArray[a];
+        mainArray[a] = b;
     }
-    sorter = partition(0, array.length - 1);
     redraw();
 }
 
-
 function draw() {
-    dimension = min(parent.offsetWidth, parent.offsetHeight);
     background(255);
     strokeWeight(4);
     stroke(255);
-    fill('#130b15');
-    for (let l = 0; l < array.length; l++) {
+    for (let l = 0; l < mainArray.length; l++) {
 
         //change keeps track of current index and index we are comparing to
-        if (l == curr) {
+        if (arrayState[l] == 1) {
             fill('#2aa84c');
-        } else if (l == comp) {
+        } else if (arrayState[l] == 2) {
             fill('#a82a67')
         } else {
             fill('#130b15');
         }
-
-        //draw rectangle (xpos, ypos, width, height);
-        //canvas 0,0 = top left
-        rect(l * (width / array.length), height + 4, (width / array.length), -array[l]);
-    }
-    if (sorter.next().done) {
-        noLoop();
+        rect(l * (width / mainArray.length), height + 4, (width / mainArray.length), -mainArray[l]);
     }
 }
 
-function swap(i, j) {
-    let tmp = array[i]; //Temporary variable to hold the current number
-    array[i] = array[j];
-    array[j] = tmp;
-}
-
-function* bubblesort() {
-    for (let x = 0; x < array.length - 1; x++) {
-        for (let z = 0; z < array.length - x - 1; z++) {
-            curr = z;
-            comp = z + 1;
-            yield;                              //yield to so we can redraw array
-            if (array[z] > array[z + 1]) {
-                //Swap the numbers
-                swap(z, z + 1)
-            }
-            curr = z + 1;
-            comp = z;
-            yield;
-        }
-    }
-}
-
-function* partition(low, high) {
-    let pivot = array[high];
-    curr = high;
-    let j = low;
-    for (let i = low; i < high; i++) {
-        if (array[i] > pivot) {
-            swap(i, i + 1);
-        } else {
-            j++;
-        }
-        comp = i; 
-
-        yield;                              //yield to so we can redraw array
-    }
-    swap(j + 1, high);
-    return (j + 1);
-}
-
-function* quicksort(low, high) {
-    if (low < high) {
-        mid = partition(low,high);
-        quicksort(low, mid - 1);
-        quicksort(mid + 1, high);
-    }
-}
+/*
+    Functions for control
+*/
 
 function windowResized() {
     resize();
 }
 
-function pause() {
-    noLoop();
-}
-
 function play() {
-    loop();
-}
-
-function step() {
-    redraw();
+    quicksort(mainArray, 0, mainArray.length - 1);
 }
 
 function restart() {
+    cancel = true;
     resize();
+}
+
+/*
+    Sorting Functions
+*/
+
+async function bubblesort(arr) {
+    for (let x = 0; x < arr.length - 1; x++) {
+        for (let z = 0; z < arr.length - x - 1; z++) {
+
+            //check if sort was cancelled
+            if (cancel) {
+                cancel = false;
+                return;
+            }
+
+            //highlights the current and compare indexes
+            arrayState[z] = 1;
+            arrayState[z + 1] = 2;
+
+            if (arr[z] > arr[z + 1]) {
+                //Swap the numbers
+                swap(arr, z, z + 1)
+            }
+
+            // sleep to give canvas timet to redraw
+            await sleep(delay);
+
+            // clears the previous state
+            arrayState.fill(0);
+        }
+    }
+    arrayState.fill(0);
+}
+
+async function partition(arr, low, high) {
+    arrayState[high] = 1;
+    let pivotVal = arr[high];
+    let pivotIndex = low;
+    for (let i = low; i < high; i++) {
+        if (arr[i] < pivotVal) {
+            await swap(arr, i, pivotIndex);
+            pivotIndex++;
+        }
+        await sleep(delay);
+    }
+    await sleep(delay);
+    await swap(arr, pivotIndex, high);
+    return pivotIndex;
+}
+
+async function quicksort(arr, low, high) {
+    if (low < high) {
+        let mid = await partition(arr, low, high);
+        arrayState[mid] = 1;
+        await Promise.all([
+            quicksort(arr, low, mid - 1),
+            quicksort(arr, mid + 1, high)
+        ]);
+    }
+}
+
+/*
+Sorting Helper Functions
+ */
+
+//swaps 2 indices of the array
+async function swap(arr, i, j) {
+    let tmp = arr[i]; //Temporary variable to hold the current number
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+
+// function to sleep during swaps so the canvas has time to redraw
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
