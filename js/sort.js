@@ -2,6 +2,7 @@ var mainArray = [];
 var arrayState = [];
 var delay = 50;
 var cancel = false;
+var sortMode = 0;
 
 var dimension, canvas, parent;
 
@@ -48,32 +49,19 @@ function draw() {
     for (let l = 0; l < mainArray.length; l++) {
 
         //change keeps track of current index and index we are comparing to
-        if (arrayState[l] == 1) {
-            fill('#2aa84c');
-        } else if (arrayState[l] == 2) {
-            fill('#a82a67')
-        } else {
-            fill('#130b15');
+        switch (arrayState[l]) {
+            case 1:
+                fill('#2aa84c');
+                break;
+            case 2:
+                fill('#a82a67')
+                break;
+            default:
+                fill('#130b15');
         }
+
         rect(l * (width / mainArray.length), height + 4, (width / mainArray.length), -mainArray[l]);
     }
-}
-
-/*
-    Functions for control
-*/
-
-function windowResized() {
-    resize();
-}
-
-function play() {
-    quicksort(mainArray, 0, mainArray.length - 1);
-}
-
-function restart() {
-    cancel = true;
-    resize();
 }
 
 /*
@@ -151,3 +139,36 @@ async function swap(arr, i, j) {
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/*
+Functions for input/output
+*/
+
+function windowResized() {
+    resize();
+}
+
+function play() {
+    quicksort(mainArray, 0, mainArray.length - 1);
+}
+
+function restart() {
+    cancel = true;
+    resize();
+}
+
+// waits for the page to load to add listeners
+$(document).ready(function () {
+    $('#play').on('click', function (event) {
+        play();
+    });
+    $('#restart').on('click', function (event) {
+        restart();
+    });
+
+    $('.dropdown-menu > ').on('click', function (event) {
+        $('.dropdown-menu > ').removeClass('active');
+        $(this).addClass('active');
+        // $('#sort-dropdown').text(this.text);
+    });
+})
