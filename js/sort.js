@@ -149,7 +149,16 @@ function windowResized() {
 }
 
 function play() {
-    quicksort(mainArray, 0, mainArray.length - 1);
+    switch (sortMode) {
+        case 0:
+            bubblesort(mainArray);
+            break;
+        case 1:
+            quicksort(mainArray, 0, mainArray.length - 1);
+            break;
+        default:
+            break;
+    }
 }
 
 function restart() {
@@ -169,6 +178,8 @@ $(document).ready(function () {
     $('.dropdown-menu > ').on('click', function (event) {
         $('.dropdown-menu > ').removeClass('active');
         $(this).addClass('active');
+        sortMode = $(this).index();
+
         // $('#sort-dropdown').text(this.text);
     });
 })
