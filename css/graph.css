@@ -1,0 +1,16 @@
+table{
+    border: none;
+}
+
+td{
+    border: 1px solid #130b15;
+}
+
+.cell {
+    width: 25px;
+    height: 25px;
+}
+
+.min-h-25{
+    min-height: 25%;
+}

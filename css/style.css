@@ -2,7 +2,6 @@
 #130b15;
 */
 
-
 body {
     font-family: 'Roboto', sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -28,10 +27,6 @@ body {
     font-weight: 100;
 }
 
-.checked {
-    color: orange;
-}
-
 a {
     color: inherit;
 }
@@ -51,6 +46,7 @@ a:hover {
     width: 200px;
     height: 200px;
     border-radius: 50% 50%;
+    border: 2px solid white;
 }
 
 .btn-light{
