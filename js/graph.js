@@ -8,6 +8,15 @@ var sortMode = 0;
 
 var cellDimension = 25;
 
+$(document).ready(function () {
+    visualGraph = $('#graph');
+    graphContainer = $('#main');
+    setupGraph();
+    setupButtonCallbacks();
+    setupCellCallbacks();
+})
+
+//creates the cells for tables
 setupGraph = function () {
     visualGraph.children().remove();
     graph = Array(Math.floor(graphContainer.height() / cellDimension));
@@ -22,36 +31,56 @@ setupGraph = function () {
     }
 }
 
-async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-$(document).ready(function () {
-    setUpCallbacks();
-    setupGraph();
-})
-
-setUpCallbacks = function () {
-    visualGraph = $('#graph');
-    graphContainer = $('#main');
-    console.log(graphContainer.height());
+setupButtonCallbacks = function () {
+    
     $('#play').on('click', function (event) {
         // play();
     });
     $('#restart').on('click', function (event) {
         // restart();
     });
-
-    visualGraph.children().children().children()
-
+  
     $('.dropdown-menu > ').on('click', function (event) {
         $('.dropdown-menu > ').removeClass('active');
         $(this).addClass('active');
         sortMode = $(this).index();
         // $('#sort-dropdown').text(this.text);
     });
+    
 }
+
+setupCellCallbacks = function(){
+    var mousePressed = false;
+    var currCell;
+
+    $('td').mousedown(function(event){
+        event.preventDefault();
+        mousePressed = true;
+        if(currCell != this){
+            $(this).toggleClass("wall")
+            currCell = this;
+        }
+    });
+
+    $('td').mousemove(function(event) {
+        if(mousePressed && currCell != this){
+            $(this).toggleClass("wall")
+            currCell = this;
+        }     
+    })
+
+    $(document).mouseup(function(event) {
+        mousePressed = false;
+        currCell = null;
+	});
+}
+
 
 $(window).resize(function () {
     setupGraph();
 })
+
+// Helper methods
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
