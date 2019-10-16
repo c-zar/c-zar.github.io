@@ -4,12 +4,16 @@ var delay = 50;
 var cancel = false;
 var sortMode = 0;
 
+//variables for input elements
+var playbtn, rstbtn;
+
 var dimension, canvas, parent;
 
 /*
     P5 js specific code
 */
 
+// setup for p5. need to direct the canvas to a parent.
 function setup() {
     parent = document.getElementById('main');
     canvas = createCanvas(dimension, dimension);
@@ -24,6 +28,7 @@ function resize() {
     initArray();
 }
 
+// initialize the array values
 function initArray() {
     //init array values based on height of screen
     mainArray = new Array(floor(dimension / 20));
@@ -98,18 +103,29 @@ async function bubblesort(arr) {
 }
 
 async function partition(arr, low, high) {
-    arrayState[high] = 1;
+    arrayState.fill(1, low, high);
     let pivotVal = arr[high];
     let pivotIndex = low;
+    arrayState[pivotIndex] = 2;
     for (let i = low; i < high; i++) {
+        
+        //cancels the sort
+        if (cancel) {
+            cancel = false;
+            return;
+        }
+
         if (arr[i] < pivotVal) {
-            await swap(arr, i, pivotIndex);
+            swap(arr, i, pivotIndex);
+            arrayState[pivotIndex] = 0;
             pivotIndex++;
+            arrayState[pivotIndex] = 2;
         }
         await sleep(delay);
     }
     await sleep(delay);
-    await swap(arr, pivotIndex, high);
+    swap(arr, pivotIndex, high);
+    arrayState.fill(0, low, high);
     return pivotIndex;
 }
 
@@ -121,6 +137,7 @@ async function quicksort(arr, low, high) {
             quicksort(arr, low, mid - 1),
             quicksort(arr, mid + 1, high)
         ]);
+        arrayState.fill(0);
     }
 }
 
@@ -129,7 +146,7 @@ Sorting Helper Functions
  */
 
 //swaps 2 indices of the array
-async function swap(arr, i, j) {
+function swap(arr, i, j) {
     let tmp = arr[i]; //Temporary variable to hold the current number
     arr[i] = arr[j];
     arr[j] = tmp;
@@ -149,6 +166,8 @@ function windowResized() {
 }
 
 function play() {
+    playbtn.prop('disabled', true);
+    cancel = false;
     switch (sortMode) {
         case 0:
             bubblesort(mainArray);
@@ -164,14 +183,19 @@ function play() {
 function restart() {
     cancel = true;
     resize();
+    playbtn.prop('disabled', false);
+
 }
 
 // waits for the page to load to add listeners
 $(document).ready(function () {
-    $('#play').on('click', function (event) {
+    playbtn = $('#play');
+    playbtn.on('click', function (event) {
         play();
     });
-    $('#restart').on('click', function (event) {
+
+    rstbtn = $('#restart');
+    rstbtn.on('click', function (event) {
         restart();
     });
 
@@ -180,6 +204,11 @@ $(document).ready(function () {
         $(this).addClass('active');
         sortMode = $(this).index();
 
-        // $('#sort-dropdown').text(this.text);
     });
+
+    $('#delay').on("input change", function (event) {
+        console.log($(this).val());
+        delay = 105 - $(this).val();
+        console.log("delay: " + delay)
+    })
 })
