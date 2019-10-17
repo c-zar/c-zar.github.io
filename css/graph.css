@@ -40,6 +40,12 @@ td {
     font-size: 10px;
 }
 
+.path {
+    display: table-cell;
+    background-color: #e60023;
+    font-size: 10px;
+}
+
 @keyframes wallAnimation {
     0% {
         border-radius: 50%;

@@ -37,7 +37,7 @@ setupGraph = function () {
             }
         }
     }
-    console.log(grid);
+    // console.log(grid);
     setupGraphCallbacks();
 }
 
@@ -114,60 +114,76 @@ $(window).resize(function () {
 
 breadthFirstSearch = async function () {
     let queue = [];
-    let prev = Array(grid.length).fill(Array(grid[0].length));
+    var prev = new Array(grid.length).fill(0).map(() => new Array(grid[0].length).fill(0));
+    // console.log(prev);
+
     queue.push($('.start'));
     $('.start').toggleClass('cell visited');
-
+    let count = 0;
+    let currCell;
     while (queue.length > 0) {
-        let currCell = queue.shift();
+        count++;
+        currCell = queue.shift();
         if ($(currCell).hasClass("end"))
             break;
         let Ypos = $(currCell).parent().index();
         let Xpos = $(currCell).index();
+        // console.log($(currCell)[0]);
+        // console.log(Ypos + "," + Xpos);
 
         //visit the neighbors
         let currNeightbor;
         if (Ypos - 1 >= 0) { //  North
             if ($($('#graph')[0].rows[Ypos - 1].cells[Xpos]).hasClass("cell")) {
                 currNeightbor = $($('#graph')[0].rows[Ypos - 1].cells[Xpos]);
-                $(currNeightbor).toggleClass("cell visited fa fa-arrow-down");
+                prev[Ypos - 1][Xpos] = $(currCell);
+                $(currNeightbor).toggleClass("cell visited");
                 queue.push(currNeightbor);
-                prev[Ypos - 1][Xpos] = currCell;
             }
         }
 
         if (Xpos + 1 < grid[0].length) { //  East
             if ($($('#graph')[0].rows[Ypos].cells[Xpos + 1]).hasClass("cell")) {
                 currNeightbor = $($('#graph')[0].rows[Ypos].cells[Xpos + 1]);
-                $(currNeightbor).toggleClass("cell visited fa fa-arrow-left");
+                prev[Ypos][Xpos + 1] = $(currCell);
+                $(currNeightbor).toggleClass("cell visited");
                 queue.push(currNeightbor);
-                prev[Ypos][Xpos + 1] = currCell;
             }
         }
 
         if (Ypos + 1 < grid.length) { //  South
             if ($($('#graph')[0].rows[Ypos + 1].cells[Xpos]).hasClass("cell")) {
                 currNeightbor = $($('#graph')[0].rows[Ypos + 1].cells[Xpos]);
-                $(currNeightbor).toggleClass("cell visited fa fa-arrow-up");
+                prev[Ypos + 1][Xpos] = $(currCell);
+                $(currNeightbor).toggleClass("cell visited");
                 queue.push(currNeightbor);
-                prev[Ypos + 1][Xpos] = currCell;
-
             }
         }
 
         if (Xpos - 1 >= 0) { //  West
             if ($($('#graph')[0].rows[Ypos].cells[Xpos - 1]).hasClass("cell")) {
                 currNeightbor = $($('#graph')[0].rows[Ypos].cells[Xpos - 1]);
-                $(currNeightbor).toggleClass("cell visited fa fa-arrow-right");
+                prev[Ypos][Xpos - 1] = $(currCell);
+                $(currNeightbor).toggleClass("cell visited");
                 queue.push($(currNeightbor));
-                prev[Ypos][Xpos - 1] = currCell;
             }
         }
 
         await sleep(5);
 
     }
-    console.log(prev);
+
+    while(currCell){
+        console.log($(currCell)[0]);
+        currCell = prev[$(currCell).parent().index()][$(currCell).index()];
+    }
+    // if($(currCell).hasClass("end")){
+    //     // while(!$(currCell).hasClass("start")){
+    //     //     $(currCell).toggleClass("visited path");
+    //     //     currCell = prev[$(currCell).parent().index()][$(currCell).index()]
+    //     // }
+    // }
+    // console.log(prev);
 }
 
 // Helper methods
