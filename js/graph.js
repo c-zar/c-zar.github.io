@@ -17,7 +17,7 @@ setupGraph = function () {
         for (let j = 0; j < graph[i].length; j++) {
             let cell = row.insertCell(j);
             cell.innerHTML = "";
-            cell.className = "cell";
+            cell.className = "cell ";
         }
     }
 }

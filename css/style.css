@@ -1,4 +1,4 @@
-/* 
+/*
 #130b15;
 */
 
@@ -36,7 +36,7 @@ a:hover {
     text-decoration: none;
 }
 
-.linked-in{
+.linked-in {
     font-size: 2em;
 }
 
@@ -49,11 +49,17 @@ a:hover {
     border: 2px solid white;
 }
 
-.btn-light{
+.btn-light {
     color: #130b15;
-    background-color: white;;
+    background-color: white;
+    ;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 300;
 }
