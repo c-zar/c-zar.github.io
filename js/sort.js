@@ -108,7 +108,7 @@ async function partition(arr, low, high) {
     let pivotIndex = low;
     arrayState[pivotIndex] = 2;
     for (let i = low; i < high; i++) {
-        
+
         //cancels the sort
         if (cancel) {
             cancel = false;

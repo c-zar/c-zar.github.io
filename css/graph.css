@@ -1,11 +1,27 @@
-table{
+table {
     border: none;
 }
 
-td{
+td {
     border: 1px solid rgba(0, 0, 0, .2);
     width: 25px;
     height: 25px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 23px;
+}
+
+.start {
+    color: #2aa84c;
+    display: table-cell;
+    font-size: 20px !important;
+
+}
+
+.end {
+    color: #a82a67;
+    display: table-cell;
+    font-size: 23px;
 }
 
 .cell {
@@ -18,32 +34,40 @@ td{
     animation-duration: 0.5s;
 }
 
+.visited {
+    display: table-cell;
+    background-color: #ffd100;
+    font-size: 10px;
+}
+
 @keyframes wallAnimation {
-    0%   {
+    0% {
         border-radius: 50%;
         transform: scale(0.0);
     }
 
     70% {
-        border-radius: 50%;        
-        transform: scale(1.1);}
+        border-radius: 50%;
+        transform: scale(1.1);
     }
+}
 
-.min-h-25{
+.min-h-25 {
     min-height: 25%;
 }
 
 @keyframes wallAnimation {
-    0%   {
+    0% {
         border-radius: 50%;
         transform: scale(0.0);
     }
 
     70% {
-        border-radius: 50%;        
-        transform: scale(1.1);}
+        border-radius: 50%;
+        transform: scale(1.1);
     }
+}
 
-.min-h-25{
+.min-h-25 {
     min-height: 25%;
 }
