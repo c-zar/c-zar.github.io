@@ -2,9 +2,12 @@ var grid;
 
 var delay = 50;
 var cancel = false;
-var sortMode = 0;
+var searchMode = 0;
 
 var cellDimension = 25;
+
+//variables for input elements
+var playbtn, rstbtn;
 
 var start, end;
 
@@ -13,7 +16,6 @@ $(document).ready(function () {
     visualGraph = $('#graph');
     setupGraph();
     setupButtonCallbacks();
-    breadthFirstSearch();
 })
 
 //creates the cells for tables
@@ -43,19 +45,44 @@ setupGraph = function () {
 
 setupButtonCallbacks = function () {
 
-    $('#play').on('click', function (event) {
-        // play();
+    playbtn = $('#play');
+    playbtn.on('click', function (event) {
+        play();
     });
-    $('#restart').on('click', function (event) {
-        // restart();
+
+    rstbtn = $('#restart');
+    rstbtn.on('click', function (event) {
+        restart();
     });
 
     $('.dropdown-menu > ').on('click', function (event) {
         $('.dropdown-menu > ').removeClass('active');
         $(this).addClass('active');
-        sortMode = $(this).index();
+        searchMode = $(this).index();
         // $('#sort-dropdown').text(this.text);
     });
+
+}
+
+function play() {
+    playbtn.prop('disabled', true);
+    cancel = false;
+    switch (searchMode) {
+        case 0:
+            breadthFirstSearch();
+            break;
+        case 1:
+            // quicksort();
+            break;
+        default:
+            break;
+    }
+}
+
+function restart() {
+    cancel = true;
+    setupGraph();
+    playbtn.prop('disabled', false);
 
 }
 
@@ -114,7 +141,7 @@ $(window).resize(function () {
 
 breadthFirstSearch = async function () {
     let queue = [];
-    var prev = new Array(grid.length).fill(0).map(() => new Array(grid[0].length).fill(0));
+    let prev = new Array(grid.length).fill(0).map(() => new Array(grid[0].length).fill(0));
     // console.log(prev);
 
     queue.push($('.start'));
@@ -122,6 +149,10 @@ breadthFirstSearch = async function () {
     let count = 0;
     let currCell;
     while (queue.length > 0) {
+        if (cancel) {
+            cancel = false;
+            return;
+        }
         count++;
         currCell = queue.shift();
         if ($(currCell).hasClass("end"))
@@ -173,7 +204,7 @@ breadthFirstSearch = async function () {
 
     }
 
-    while(currCell){
+    while (currCell) {
         console.log($(currCell)[0]);
         currCell = prev[$(currCell).parent().index()][$(currCell).index()];
     }
