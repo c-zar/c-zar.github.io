@@ -3,13 +3,46 @@ table{
 }
 
 td{
-    border: 1px solid #130b15;
-}
-
-.cell {
+    border: 1px solid rgba(0, 0, 0, .2);
     width: 25px;
     height: 25px;
 }
+
+.cell {
+    background-color: white;
+}
+
+.wall {
+    background-color: #130b15;
+    animation-name: wallAnimation;
+    animation-duration: 0.5s;
+}
+
+@keyframes wallAnimation {
+    0%   {
+        border-radius: 50%;
+        transform: scale(0.0);
+    }
+
+    70% {
+        border-radius: 50%;        
+        transform: scale(1.1);}
+    }
+
+.min-h-25{
+    min-height: 25%;
+}
+
+@keyframes wallAnimation {
+    0%   {
+        border-radius: 50%;
+        transform: scale(0.0);
+    }
+
+    70% {
+        border-radius: 50%;        
+        transform: scale(1.1);}
+    }
 
 .min-h-25{
     min-height: 25%;
