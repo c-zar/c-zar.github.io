@@ -80,7 +80,7 @@ function play() {
     cancel = false;
     switch (searchMode) {
         case 0:
-            breadthFirstSearch();
+            BFS();
             break;
         case 1:
             break;
@@ -165,7 +165,7 @@ $(window).resize(function () {
 
 // breadth first search
 // unweighted, guarantees shortest path if one exists
-breadthFirstSearch = async function () {
+BFS = async function () {
     let queue = []; //queue used to store visited nodes
 
     //2d array holding the previous cells. used to keep track of shortest path.
@@ -178,7 +178,7 @@ breadthFirstSearch = async function () {
     while (queue.length > 0) {
         if (cancel) //used to stop search if cancelled
             return;
-        
+
         currCell = queue.shift(); //FIFO
         if ($(currCell).hasClass("end")) //if target found, stop search
             break;
@@ -258,9 +258,89 @@ breadthFirstSearch = async function () {
     // console.log(prev);
 }
 
-// Helper methods
+// Depth First Search
+DFS = async function () {
+    let stack = []; //queue used to store visited nodes
 
-//used to pause during loops to allow animations to start at different times
-async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+    //2d array holding the previous cells. used to keep track of shortest path.
+    let prev = new Array(grid.length).fill(0).map(() => new Array(grid[0].length).fill(0));
+    // console.log(prev);
+
+    stack.push($('.start'));
+    $('.start').toggleClass('cell visited'); //tracking visited cells by classname
+    let currCell; //used in the end to see if target cell was found
+    while (stack.length > 0) {
+        if (cancel) //used to stop search if cancelled
+            return;
+
+        currCell = stack.pop(); //FIFO
+        if ($(currCell).hasClass("end")) //if target found, stop search
+            break;
+
+        //cell position in graph
+        let Ypos = $(currCell).parent().index();
+        let Xpos = $(currCell).index();
+        // console.log($(currCell)[0]);
+        // console.log(Ypos + "," + Xpos);
+
+        //visit the neighbors in cardinal order
+        let currNeightbor;
+        if (Ypos - 1 >= 0) { //  North
+            if ($($('#graph')[0].rows[Ypos - 1].cells[Xpos]).hasClass("cell")) {
+                currNeightbor = $($('#graph')[0].rows[Ypos - 1].cells[Xpos]);
+                prev[Ypos - 1][Xpos] = $(currCell);
+                $(currNeightbor).toggleClass("cell visited");
+                stack.push(currNeightbor);
+            }
+        }else if (Xpos + 1 < grid[0].length) { //  East
+            if ($($('#graph')[0].rows[Ypos].cells[Xpos + 1]).hasClass("cell")) {
+                currNeightbor = $($('#graph')[0].rows[Ypos].cells[Xpos + 1]);
+                prev[Ypos][Xpos + 1] = $(currCell);
+                $(currNeightbor).toggleClass("cell visited");
+                stack.push(currNeightbor);
+            }
+        } else if (Ypos + 1 < grid.length) { //  South
+            if ($($('#graph')[0].rows[Ypos + 1].cells[Xpos]).hasClass("cell")) {
+                currNeightbor = $($('#graph')[0].rows[Ypos + 1].cells[Xpos]);
+                prev[Ypos + 1][Xpos] = $(currCell);
+                $(currNeightbor).toggleClass("cell visited");
+                stack.push(currNeightbor);
+            }
+        } else if (Xpos - 1 >= 0) { //  West
+            if ($($('#graph')[0].rows[Ypos].cells[Xpos - 1]).hasClass("cell")) {
+                currNeightbor = $($('#graph')[0].rows[Ypos].cells[Xpos - 1]);
+                prev[Ypos][Xpos - 1] = $(currCell);
+                $(currNeightbor).toggleClass("cell visited");
+                stack.push($(currNeightbor));
+            }
+        }
+
+        await sleep(0); //sleep to allow animations time to load
+    }
+
+    // if target found, highlight the shortest path
+    if ($(currCell).hasClass("end")) {
+        await sleep(500); //sleep to allow search animations to
+        if (cancel) //used to stop search if cancelled
+            return;
+        let shortestPath = [];
+        let pathCell;
+        // traverse the prev array from the end postion to the start pushing each cell on to a stack
+        while (currCell) {
+            shortestPath.push(currCell);
+            currCell = prev[$(currCell).parent().index()][$(currCell).index()];
+        }
+        //path was found backwards so we reverse
+        while (shortestPath.length > 0) {
+            pathCell = shortestPath.pop();
+            $(pathCell).toggleClass("visited path")
+            await sleep(50);
+        }
+    }
+
+    // Helper methods
+
+    //used to pause during loops to allow animations to start at different times
+    async function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
