@@ -1,21 +1,19 @@
+//global variables
 var grid;
-
-var delay = 50;
-var cancel = false;
+var cancel = true;
 var searchMode = 0;
 
-var cellDimension = 25;
+var cellDimension = 25; //px
 
 //variables for input elements
-var playbtn, rstbtn;
+var playbtn, stopbtn, resetbtn;
 
-var start, end;
-
-
+//waits for the page to load before any queries
 $(document).ready(function () {
     visualGraph = $('#graph');
-    setupGraph();
     setupButtonCallbacks();
+    reset();
+
 })
 
 //creates the cells for tables
@@ -39,10 +37,16 @@ setupGraph = function () {
             }
         }
     }
-    // console.log(grid);
     setupGraphCallbacks();
 }
 
+//resets the grid without clearing walls
+stopSearch = function () {
+    $('.visited').toggleClass("visited cell");
+    $('.path').toggleClass("path cell");
+}
+
+// sets up callbacks for the buttons and menu
 setupButtonCallbacks = function () {
 
     playbtn = $('#play');
@@ -50,9 +54,14 @@ setupButtonCallbacks = function () {
         play();
     });
 
-    rstbtn = $('#restart');
-    rstbtn.on('click', function (event) {
-        restart();
+    stopbtn = $('#stop');
+    stopbtn.on('click', function (event) {
+        stop();
+    });
+
+    resetbtn = $('#reset');
+    resetbtn.on('click', function (event) {
+        reset();
     });
 
     $('.dropdown-menu > ').on('click', function (event) {
@@ -64,6 +73,8 @@ setupButtonCallbacks = function () {
 
 }
 
+// starts the asynchrounous pathfinding algorithm
+// button disabled after because only 1 should be running at a time
 function play() {
     playbtn.prop('disabled', true);
     cancel = false;
@@ -72,53 +83,65 @@ function play() {
             breadthFirstSearch();
             break;
         case 1:
-            // quicksort();
             break;
         default:
             break;
     }
 }
 
-function restart() {
+// function used to end the visualization and clear the graph
+function stop() {
+    cancel = true;
+    stopSearch();
+    playbtn.prop('disabled', false);
+}
+
+//function to reinitialize the grid cells
+function reset() {
     cancel = true;
     setupGraph();
     playbtn.prop('disabled', false);
-
 }
 
+
+// mouse callbacks for manipulating cells
 setupGraphCallbacks = function () {
+
+    // tracking variables
     var mousePressed = false;
     var startPressed = false;
     var endPressed = false;
     var currCell;
 
     $('td').mousedown(function (event) {
-        event.preventDefault();
-        mousePressed = true;
-        // console.log($(this).parent().index() + "," + $(this).index());
-        if ($(this).hasClass("start")) {
-            startPressed = true;
-            currCell = this;
-        } else if ($(this).hasClass("end")) {
-            endPressed = true;
-            currCell = this;
-        } else if (currCell != this) {
-            $(this).toggleClass("cell wall");
-            currCell = this;
+        if (cancel) {
+            event.preventDefault();
+            mousePressed = true;
+            if ($(this).hasClass("start")) { //start cell pressed
+                startPressed = true;
+                currCell = this;
+            } else if ($(this).hasClass("end")) { //target cell pressed
+                endPressed = true;
+                currCell = this;
+            } else if (currCell != this) {
+                $(this).toggleClass("cell wall"); //normal cell/wall pressed
+                currCell = this;
+            }
         }
     });
 
     $('td').mousemove(function (event) {
         if (mousePressed && currCell != this) {
-            if (startPressed && !$(this).hasClass("wall") && !$(this).hasClass("end")) {
+            if (startPressed && !$(this).hasClass("wall") && !$(this).hasClass("end")) { //start cell can only be moved to normal cells
                 $(currCell).toggleClass("start fa fa-car");
                 $(this).toggleClass("start fa fa-car");
                 currCell = this;
-            } else if (endPressed && !$(this).hasClass("wall") && !$(this).hasClass("start")) {
+            } else if (endPressed && !$(this).hasClass("wall") && !$(this).hasClass("start")) { //end cell can only be moved to normal cells
                 $(currCell).toggleClass("end fa fa-dot-circle-o");
                 $(this).toggleClass("end fa fa-dot-circle-o");
                 currCell = this;
-            } else if (!startPressed && !endPressed && !$(this).hasClass("end") && !$(this).hasClass("start")) {
+            } else if (!startPressed && !endPressed && !$(this).hasClass("end") && !$(this).hasClass("start") &&
+                !$(this).hasClass("visited") && !$(this).hasClass("path")) { //toggle cells/walls if mouse held over
                 $(this).toggleClass("cell wall");
                 currCell = this;
             }
@@ -126,6 +149,7 @@ setupGraphCallbacks = function () {
 
     })
 
+    // reset all variables when mouse button released
     $(document).mouseup(function (event) {
         mousePressed = false;
         startPressed = false;
@@ -134,35 +158,38 @@ setupGraphCallbacks = function () {
     });
 }
 
-
+// clear graph on window resize
 $(window).resize(function () {
-    setupGraph();
+    reset();
 })
 
+// breadth first search
+// unweighted, guarantees shortest path if one exists
 breadthFirstSearch = async function () {
-    let queue = [];
+    let queue = []; //queue used to store visited nodes
+
+    //2d array holding the previous cells. used to keep track of shortest path.
     let prev = new Array(grid.length).fill(0).map(() => new Array(grid[0].length).fill(0));
     // console.log(prev);
 
     queue.push($('.start'));
-    $('.start').toggleClass('cell visited');
-    let count = 0;
-    let currCell;
+    $('.start').toggleClass('cell visited'); //tracking visited cells by classname
+    let currCell; //used in the end to see if target cell was found
     while (queue.length > 0) {
-        if (cancel) {
-            cancel = false;
+        if (cancel) { //used to stop search if cancelled
             return;
         }
-        count++;
-        currCell = queue.shift();
-        if ($(currCell).hasClass("end"))
+        currCell = queue.shift(); //FIFO
+        if ($(currCell).hasClass("end")) //if target found, stop search
             break;
+
+        //cell position in graph
         let Ypos = $(currCell).parent().index();
         let Xpos = $(currCell).index();
         // console.log($(currCell)[0]);
         // console.log(Ypos + "," + Xpos);
 
-        //visit the neighbors
+        //visit the neighbors in cardinal order
         let currNeightbor;
         if (Ypos - 1 >= 0) { //  North
             if ($($('#graph')[0].rows[Ypos - 1].cells[Xpos]).hasClass("cell")) {
@@ -200,13 +227,26 @@ breadthFirstSearch = async function () {
             }
         }
 
-        await sleep(5);
-
+        await sleep(0); //sleep to allow animations time to load
     }
 
-    while (currCell) {
-        console.log($(currCell)[0]);
-        currCell = prev[$(currCell).parent().index()][$(currCell).index()];
+    // if target found, highlight the shortest path
+    if ($(currCell).hasClass("end")) {
+        await sleep(1000); //sleep to allow search animations to
+
+        let shortestPath = [];
+        let pathCell;
+        // traverse the prev array from the end postion to the start pushing each cell on to a stack
+        while (currCell) {
+            shortestPath.push(currCell);
+            currCell = prev[$(currCell).parent().index()][$(currCell).index()];
+        }
+        //path was found backwards so we reverse
+        while (shortestPath.length > 0) {
+            pathCell = shortestPath.pop();
+            $(pathCell).toggleClass("visited path")
+            await sleep(50);
+        }
     }
     // if($(currCell).hasClass("end")){
     //     // while(!$(currCell).hasClass("start")){

@@ -5,7 +5,7 @@ var cancel = false;
 var sortMode = 0;
 
 //variables for input elements
-var playbtn, rstbtn;
+var playbtn, stopbtn;
 
 var dimension, canvas, parent;
 
@@ -133,10 +133,12 @@ async function quicksort(arr, low, high) {
     if (low < high) {
         let mid = await partition(arr, low, high);
         arrayState[mid] = 1;
-        await Promise.all([
+        await quicksort(arr, low, mid - 1);
+        await quicksort(arr, mid + 1, high);
+        /* await Promise.all([
             quicksort(arr, low, mid - 1),
             quicksort(arr, mid + 1, high)
-        ]);
+        ]); */
         arrayState.fill(0);
     }
 }
@@ -194,8 +196,8 @@ $(document).ready(function () {
         play();
     });
 
-    rstbtn = $('#restart');
-    rstbtn.on('click', function (event) {
+    stopbtn = $('#restart');
+    stopbtn.on('click', function (event) {
         restart();
     });
 

@@ -36,16 +36,20 @@ td {
 
 .visited {
     display: table-cell;
-    background-color: #F48024;
+    background-color: #E1BEE7;
     font-size: 10px;
     animation: visitAnimation;
-    animation-duration: 2s;
+    animation-duration: 3s;
+    border: 1px solid white;
+
 }
 
 .path {
     display: table-cell;
-    background-color: #e60023;
-    font-size: 10px;
+    background-color: #FFCA28;
+    animation: pathAnimation;
+    animation-duration: 2s;
+    border: none;
 }
 
 @keyframes wallAnimation {
@@ -62,15 +66,34 @@ td {
 
 @keyframes visitAnimation {
     0% {
-        /* border-radius: 50%; */
-        background-color: white;
-        transform: scale(0.0);
+        border: 1px solid rgba(0, 0, 0, .2);
+        border-radius: 50%;
+        background-color: #311B92;
+        transform: scale(0);
     }
 
     50% {
-        background-color: #ffb900;
-        /* border-radius: 50%; */
+        border: 1px solid rgba(0, 0, 0, .2);
+        border-radius: 50%;
+    }
+
+    100% {
+        background-color: #E1BEE7;
         transform: scale(1.0);
+    }
+}
+
+@keyframes pathAnimation {
+    0% {
+        background-color: #E65100;
+    }
+
+    50% {
+        background-color: #FB8C00;
+    }
+
+    100% {
+        background-color: #FFCA28;
     }
 }
 
