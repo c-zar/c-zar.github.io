@@ -176,9 +176,9 @@ breadthFirstSearch = async function () {
     $('.start').toggleClass('cell visited'); //tracking visited cells by classname
     let currCell; //used in the end to see if target cell was found
     while (queue.length > 0) {
-        if (cancel) { //used to stop search if cancelled
+        if (cancel) //used to stop search if cancelled
             return;
-        }
+        
         currCell = queue.shift(); //FIFO
         if ($(currCell).hasClass("end")) //if target found, stop search
             break;
@@ -232,8 +232,9 @@ breadthFirstSearch = async function () {
 
     // if target found, highlight the shortest path
     if ($(currCell).hasClass("end")) {
-        await sleep(1000); //sleep to allow search animations to
-
+        await sleep(500); //sleep to allow search animations to
+        if (cancel) //used to stop search if cancelled
+            return;
         let shortestPath = [];
         let pathCell;
         // traverse the prev array from the end postion to the start pushing each cell on to a stack
@@ -258,6 +259,8 @@ breadthFirstSearch = async function () {
 }
 
 // Helper methods
+
+//used to pause during loops to allow animations to start at different times
 async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
