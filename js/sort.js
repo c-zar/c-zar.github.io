@@ -122,8 +122,8 @@ async function partition(arr, low, high) {
             arrayState[pivotIndex] = 0;
             pivotIndex++;
             arrayState[pivotIndex] = 1;
+            await sleep(delay);
         }
-        await sleep(delay);
     }
     await sleep(delay);
     swap(arr, pivotIndex, high);
@@ -154,7 +154,6 @@ async function merge(arr, low, mid, high) {
     let j = 0;
     let k = low;
     while (i < arr1.length && j < arr2.length) {
-        //cancels the sort
         if (cancel)
             return;
 
@@ -167,7 +166,6 @@ async function merge(arr, low, mid, high) {
         await sleep(delay);
     }
     while (i < arr1.length) {
-        //cancels the sort
         if (cancel)
             return;
 
@@ -177,7 +175,6 @@ async function merge(arr, low, mid, high) {
         await sleep(delay);
     }
     while (j < arr2.length) {
-        //cancels the sort
         if (cancel)
             return;
 
