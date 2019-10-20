@@ -1,7 +1,7 @@
 var mainArray = [];
 var arrayState = [];
 var delay = 50;
-var cancel = false;
+var cancel = true;
 var sortMode = 0;
 
 //variables for input elements
@@ -10,10 +10,11 @@ var playbtn, stopbtn;
 var dimension, canvas, parent;
 
 /*
-    P5 js specific code
+    P5.js specific code
 */
 
-// setup for p5. need to direct the canvas to a parent.
+// setup for p5
+// need to direct the canvas to a parent.
 function setup() {
     parent = document.getElementById('main');
     canvas = createCanvas(dimension, dimension);
@@ -34,7 +35,7 @@ function initArray() {
     mainArray = new Array(floor(dimension / 20));
     arrayState = Array(mainArray.length).fill(0);
     for (i = 0; i < mainArray.length; i++) {
-        mainArray[i] = ((i + 1) / mainArray.length) * dimension;
+        mainArray[i] = floor(((i + 1) / mainArray.length) * dimension);
     }
 
     //shuffle values
@@ -70,7 +71,7 @@ function draw() {
 }
 
 /*
-    Sorting Functions
+    Sorting Algorithms
 */
 
 async function bubblesort(arr) {
@@ -79,7 +80,6 @@ async function bubblesort(arr) {
 
             //check if sort was cancelled
             if (cancel) {
-                cancel = false;
                 return;
             }
 
@@ -102,44 +102,104 @@ async function bubblesort(arr) {
     arrayState.fill(0);
 }
 
+// used by quicksort
+//moves every value lower to the left of the pivot
+//every value greater to the right of the pivot
 async function partition(arr, low, high) {
-    arrayState.fill(1, low, high);
-    let pivotVal = arr[high];
+    arrayState.fill(2, low, high);
+    let pivotVal = arr[high]; //pivot val is chosen by last index
     let pivotIndex = low;
-    arrayState[pivotIndex] = 2;
+    arrayState[pivotIndex] = 1;
     for (let i = low; i < high; i++) {
 
         //cancels the sort
-        if (cancel) {
-            cancel = false;
+        if (cancel)
             return;
-        }
+
 
         if (arr[i] < pivotVal) {
             swap(arr, i, pivotIndex);
             arrayState[pivotIndex] = 0;
             pivotIndex++;
-            arrayState[pivotIndex] = 2;
+            arrayState[pivotIndex] = 1;
         }
         await sleep(delay);
     }
     await sleep(delay);
     swap(arr, pivotIndex, high);
-    arrayState.fill(0, low, high);
+    arrayState.fill(0);
     return pivotIndex;
 }
 
+// simple quicksort
 async function quicksort(arr, low, high) {
     if (low < high) {
+        //get partiotioned index and quicksort subarray to left and right
         let mid = await partition(arr, low, high);
-        arrayState[mid] = 1;
         await quicksort(arr, low, mid - 1);
         await quicksort(arr, mid + 1, high);
-        /* await Promise.all([
-            quicksort(arr, low, mid - 1),
-            quicksort(arr, mid + 1, high)
-        ]); */
         arrayState.fill(0);
+
+    }
+}
+
+// used by mergesort
+// sorts 2 subarrays by storing values in intermediate array
+async function merge(arr, low, mid, high) {
+    arrayState.fill(2, low, high + 1);
+    let arr1 = arr.slice(low, mid + 1);
+    let arr2 = arr.slice(mid + 1, high + 1);
+
+    let i = 0;
+    let j = 0;
+    let k = low;
+    while (i < arr1.length && j < arr2.length) {
+        //cancels the sort
+        if (cancel)
+            return;
+
+        arrayState.fill(0, low, k);
+        arrayState[k] = 1;
+        if (arr1[i] < arr2[j])
+            arr[k++] = arr1[i++];
+        else
+            arr[k++] = arr2[j++];
+        await sleep(delay);
+    }
+    while (i < arr1.length) {
+        //cancels the sort
+        if (cancel)
+            return;
+
+        arrayState.fill(0, low, k);
+        arrayState[k] = 1;
+        arr[k++] = arr1[i++];
+        await sleep(delay);
+    }
+    while (j < arr2.length) {
+        //cancels the sort
+        if (cancel)
+            return;
+
+        arrayState.fill(0, low, k);
+        arrayState[k] = 1;
+        arr[k++] = arr2[j++];
+        await sleep(delay);
+    }
+    arrayState.fill(0);
+}
+
+// simple mergesort
+// gets the middle of array and split recursively
+// then merge subarrays
+async function mergeSort(arr, low, high) {
+    if (low < high) {
+        let mid = floor((low + high) / 2);
+        await mergeSort(arr, low, mid);
+        await mergeSort(arr, mid + 1, high);
+        await merge(arr, low, mid, high);
+        arrayState.fill(0);
+
     }
 }
 
@@ -162,32 +222,6 @@ async function sleep(ms) {
 /*
 Functions for input/output
 */
-
-function windowResized() {
-    resize();
-}
-
-function play() {
-    playbtn.prop('disabled', true);
-    cancel = false;
-    switch (sortMode) {
-        case 0:
-            bubblesort(mainArray);
-            break;
-        case 1:
-            quicksort(mainArray, 0, mainArray.length - 1);
-            break;
-        default:
-            break;
-    }
-}
-
-function restart() {
-    cancel = true;
-    resize();
-    playbtn.prop('disabled', false);
-
-}
 
 // waits for the page to load to add listeners
 $(document).ready(function () {
@@ -214,3 +248,32 @@ $(document).ready(function () {
         console.log("delay: " + delay)
     })
 })
+
+function windowResized() {
+    resize();
+}
+
+function play() {
+    playbtn.prop('disabled', true);
+    cancel = false;
+    switch (sortMode) {
+        case 0:
+            bubblesort(mainArray);
+            break;
+        case 1:
+            quicksort(mainArray, 0, mainArray.length - 1);
+            break;
+        case 2:
+            mergeSort(mainArray, 0, mainArray.length - 1);
+            break;
+        default:
+            break;
+    }
+}
+
+function restart() {
+    cancel = true;
+    resize();
+    playbtn.prop('disabled', false);
+
+}

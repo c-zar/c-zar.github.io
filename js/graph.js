@@ -13,67 +13,11 @@ $(document).ready(function () {
     setupAll();
 })
 
+// gets the element where graph will be inserted and starts creation
 function setupAll() {
     visualGraph = $('#graph');
     setupButtonCallbacks();
     reset();
-}
-
-//creates the cells for tables
-setupGraph = function () {
-    var visualGraph = $('#graph');
-    var graphContainer = $('#main');
-    visualGraph.children().remove();
-    grid = Array(Math.floor(graphContainer.height() / cellDimension));
-    for (let i = 0; i < grid.length; i++) {
-        grid[i] = Array(Math.floor(graphContainer.width() / cellDimension));
-        let row = visualGraph[0].insertRow(i);
-        for (let j = 0; j < grid[i].length; j++) {
-            let cell = row.insertCell(j);
-            grid[i][j] = cell;
-            if (i == 1 && j == 1) {
-                cell.className = "cell start fa fa-car";
-            } else if (i == grid.length - 2 && j == grid[i].length - 2) {
-                cell.className = "cell end fa fa-dot-circle-o";
-            } else {
-                cell.className = "cell";
-            }
-        }
-    }
-    setupGraphCallbacks();
-}
-
-//resets the grid without clearing walls
-stopSearch = function () {
-    $('.visited').toggleClass("visited cell");
-    $('.path').toggleClass("path cell");
-}
-
-// sets up callbacks for the buttons and menu
-setupButtonCallbacks = function () {
-
-    playbtn = $('#play');
-    playbtn.on('click', function (event) {
-        play();
-    });
-
-    stopbtn = $('#stop');
-    stopbtn.on('click', function (event) {
-        stop();
-    });
-
-    resetbtn = $('#reset');
-    resetbtn.on('click', function (event) {
-        reset();
-    });
-
-    $('.dropdown-menu > ').on('click', function (event) {
-        $('.dropdown-menu > ').removeClass('active');
-        $(this).addClass('active');
-        searchMode = $(this).index();
-        // $('#sort-dropdown').text(this.text);
-    });
-
 }
 
 // starts the asynchrounous pathfinding algorithm
@@ -166,6 +110,67 @@ setupGraphCallbacks = function () {
 $(window).resize(function () {
     reset();
 })
+
+//creates the cells for tables
+setupGraph = function () {
+    var visualGraph = $('#graph');
+    var graphContainer = $('#main');
+    visualGraph.children().remove();
+    grid = Array(Math.floor(graphContainer.height() / cellDimension));
+    for (let i = 0; i < grid.length; i++) {
+        grid[i] = Array(Math.floor(graphContainer.width() / cellDimension));
+        let row = visualGraph[0].insertRow(i);
+        for (let j = 0; j < grid[i].length; j++) {
+            let cell = row.insertCell(j);
+            grid[i][j] = cell;
+            if (i == 1 && j == 1) {
+                cell.className = "cell start fa fa-car";
+            } else if (i == grid.length - 2 && j == grid[i].length - 2) {
+                cell.className = "cell end fa fa-dot-circle-o";
+            } else {
+                cell.className = "cell";
+            }
+        }
+    }
+    setupGraphCallbacks();
+}
+
+//resets the grid without clearing walls
+stopSearch = function () {
+    $('.visited').toggleClass("visited cell");
+    $('.path').toggleClass("path cell");
+}
+
+// sets up callbacks for the buttons and menu
+setupButtonCallbacks = function () {
+
+    playbtn = $('#play');
+    playbtn.on('click', function (event) {
+        play();
+    });
+
+    stopbtn = $('#stop');
+    stopbtn.on('click', function (event) {
+        stop();
+    });
+
+    resetbtn = $('#reset');
+    resetbtn.on('click', function (event) {
+        reset();
+    });
+
+    $('.dropdown-menu > ').on('click', function (event) {
+        $('.dropdown-menu > ').removeClass('active');
+        $(this).addClass('active');
+        searchMode = $(this).index();
+        // $('#sort-dropdown').text(this.text);
+    });
+
+}
+
+/*
+Pathfinding algorithms
+*/
 
 // breadth first search
 // unweighted, guarantees shortest path if one exists
@@ -273,7 +278,7 @@ DFS = async function () {
     let prev = new Array(grid.length).fill(0).map(() => new Array(grid[0].length).fill(0));
     // console.log(prev);
 
-    stack.push($('.start'));    //push the start node
+    stack.push($('.start')); //push the start node
     $('.start').toggleClass('cell visited'); //tracking visited cells by classname
     let currCell; //used in the end to see if target cell was found
     while (stack.length > 0) {
