@@ -1,6 +1,9 @@
 /*
 #130b15;
 */
+.fa {
+    text-rendering: optimizeLegibility;
+}
 
 body {
     font-family: 'Roboto', sans-serif;
