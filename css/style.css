@@ -5,6 +5,10 @@
     text-rendering: optimizeLegibility;
 }
 
+@font-face {
+    font-family: 'FontAwesome';
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     -webkit-font-smoothing: antialiased;
